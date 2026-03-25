@@ -56,6 +56,7 @@ function (xhr, ajaxOptions, thrownError) {
  -->
 <script>
   //jQuery( document ).tooltip();
+  var actualizando = false;
 
   jQuery( "#flectura" ).datepicker({
         changeMonth: true,
@@ -80,7 +81,7 @@ function (xhr, ajaxOptions, thrownError) {
       type: "POST",
       data: {'action':'busca_pacientes','fecha_pacientes':fecha_pacientes},
       dataType: "json",
-      url:'http://www.metabolicaschile.cl/pku_movil/wp-admin/admin-ajax.php',
+      url: url_ajax,
       beforeSend: function () {
                         jQuery("#resultado").html("Procesando, espere por favor...");
             },
@@ -92,20 +93,40 @@ function (xhr, ajaxOptions, thrownError) {
 
   function errorEnvio(e) {
     jQuery("#log").text("Erro envio datos");
-    e.preventDefault();
+    return false;
   }
 
   function mostrarPacientes( aDatos )
   {
     if(aDatos[0].nombres !='Sin Datos'){
-      var op_nombres = '<div class="box_nom_campos"><label class="nom_campo" id="nro">Nro.</label><label class="nom_campo" id="nom">Nombre</label><label class="nom_campo aminoacidos">Fen</label><label class="nom_campo aminoacidos msud">Msud</label><label class="nom_campo aminoacidos">Tir</label><label class="nom_campo fech">F. Muestra</label><label class="nom_campo" id="estado">Estado</label><label class="nom_campo fech">P. Muestra</label><label class="nom_campo fech">F. Leche</label><label class="nom_campo fech">F. Control</label></div>';
+      var op_nombres = '<div class="box_nom_campos">'+
+      '<label class="nom_campo" id="nro">Nro.</label>'+
+      '<label class="nom_campo" id="nom">Nombre</label>'+
+      '<label class="nom_campo aminoacidos">Fen</label>'+
+      '<label class="nom_campo aminoacidos leu">Leu</label>'+
+      '<label class="nom_campo aminoacidos">Tir</label>'+
+      '<label class="nom_campo aminoacidos">Val</label>'+
+      '<label class="nom_campo aminoacidos">Iso</label>'+
+      '<label class="nom_campo aminoacidos">Allow</label>'+
+      '<label class="nom_campo fech">F. Muestra</label>'+
+      '<label class="nom_campo" id="estado">Estado</label>'+
+      '<label class="nom_campo fech">P. Muestra</label>'+
+      '<label class="nom_campo fech">F. Control</label>'+
+      '</div>';
       for( var c=1; c <= aDatos.length; c++ )
       {
 
          op_nombres +='<div id="registro'+c+'" class="registro registro'+c+'" rel="'+c+'">';
          op_nombres +='<div class="numero" rel="'+aDatos[c-1].id+'"><label class="nro_paciente">'+c+'.</label><input type="checkbox" id="nro" name="nro'+c+'" value=""/></div>';
-         op_nombres +='<label class="nombre'+c+' nombre" >'+aDatos[c-1].nombres+'</label><label class="amino" title="'+aDatos[c-1].fenil+'">'+aDatos[c-1].fenil+'</label><label class="amino msud" title="'+aDatos[c-1].msud+'">'+aDatos[c-1].msud+'</label><label class="amino" title="'+aDatos[c-1].tir+'">'+aDatos[c-1].tir+'</label><label class="fecha">'+aDatos[c-1].fmuestra+'</label>';
-         op_nombres +='<input type="hidden" name="id'+c+'" value="'+aDatos[c-1].id+'" /><input type="text" name="estado'+c+'" class="estado" value="'+aDatos[c-1].estado+'" placeholder="Indicación" /><input type="text" name="pmuestra'+c+'" class="pmuestra" value="'+aDatos[c-1].plectura+'" placeholder="P. Muestra" /><input type="text" name="fleche'+c+'" class="fleche fecha" value="'+aDatos[c-1].fleche+'" placeholder="dd-mm-aaaa" /><input type="text" name="fcontrol'+c+'" class="fcontrol fecha" value="'+aDatos[c-1].fcontrol+'" placeholder="dd-mm-aaaa" /></div>';
+         op_nombres +='<label class="nombre'+c+' nombre" >'+aDatos[c-1].nombres+'</label>'+
+          '<label class="amino" title="'+aDatos[c-1].fenil+'">'+aDatos[c-1].fenil+'</label>'+
+          '<label class="amino leu" title="'+aDatos[c-1].leu+'">'+aDatos[c-1].leu+'</label>'+
+          '<label class="amino" title="'+aDatos[c-1].tir+'">'+aDatos[c-1].tir+'</label>'+
+          '<label class="amino" title="'+aDatos[c-1].val+'">'+aDatos[c-1].val+'</label>'+
+          '<label class="amino" title="'+aDatos[c-1].iso+'">'+aDatos[c-1].iso+'</label>'+
+          '<label class="amino" title="'+aDatos[c-1].allo+'">'+aDatos[c-1].allo+'</label>'+
+          '<label class="fecha">'+aDatos[c-1].fmuestra+'</label>';
+         op_nombres +='<input type="hidden" name="id'+c+'" value="'+aDatos[c-1].id+'" /><input type="text" name="estado'+c+'" class="estado" value="'+aDatos[c-1].estado+'" placeholder="Indicación" /><input type="text" name="pmuestra'+c+'" class="pmuestra" value="'+aDatos[c-1].plectura+'" placeholder="P. Muestra" /><input type="text" name="fcontrol'+c+'" class="fcontrol fecha" value="'+aDatos[c-1].fcontrol+'" placeholder="dd-mm-aaaa" /></div>';
       }
        op_nombres +='<input type="button" name="enviar" id="enviar" value="Enviar Datos" onclick="actualiza_pacientes();" />';
     }else {
@@ -130,7 +151,8 @@ function (xhr, ajaxOptions, thrownError) {
     jQuery("#resultado").html("OK");
   }
 
-  function actualiza_pacientes(e){
+  function actualiza_pacientes(e) {
+    if (!actualizando) {
       var fecha =  jQuery('#flectura').val();
       if(jQuery('#flectura').val() == '' || fecha.length < 10){
         alert('Ingrese Fecha Correcta') ; return false;
@@ -158,18 +180,21 @@ function (xhr, ajaxOptions, thrownError) {
             cache: true,
         data:
         {'action':'actualizar_pacientes', 'id' : id, 'nom_paciente' : nom_paciente, 'flectura' : flectura, 'estado' : estado, 'pmuestra' : pmuestra, 'fleche' : fleche, 'fcontrol' : fcontrol},
-        url:'http://www.metabolicaschile.cl/pku_movil/wp-admin/admin-ajax.php',
+        url: url_ajax,
         dataType: "json",
         beforeSend: function () {
                    jQuery("#resultado").html("Procesando, espere por favor...");
         },
         success:
           mostrarResultados,
+          actualizando: true,
           timeout: 35000,
           error: errorEnvio
       });
-      e.preventDefault();
     }
+    
+    e.preventDefault();
+  }
 
     /*** Funcion mostrar resultados ****/
     function mostrarResultados( aDatos ) {

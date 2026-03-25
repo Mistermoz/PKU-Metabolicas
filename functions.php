@@ -15,3 +15,17 @@ require ( get_template_directory() . '/includes/post-custom-meta.php' );
 require ( get_template_directory() . '/includes/tha-theme-hooks.php' );
 require ( get_template_directory() . '/includes/hooks.php' );
 require ( get_template_directory() . '/includes/version.php' );
+
+function remove_wp_ver_css_js( $src ) {
+    if ( strpos( $src, 'ver=' ) )
+        $src = remove_query_arg( 'ver', $src );
+    return $src;
+}
+add_filter( 'style_loader_src', 'remove_wp_ver_css_js', 9999 );
+add_filter( 'script_loader_src', 'remove_wp_ver_css_js', 9999 );
+
+add_filter( 'logout_url', 'my_logout_url' );
+function my_logout_url( $url ) {
+    $redirect = home_url();
+    return $url.'&redirect_to='.$redirect;
+}

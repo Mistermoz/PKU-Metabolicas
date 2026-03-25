@@ -56,7 +56,6 @@ function (xhr, ajaxOptions, thrownError) {
  -->
 <script>
   //jQuery( document ).tooltip();
-
   jQuery( "#flectura" ).datepicker({
         changeMonth: true,
         changeYear: true,
@@ -80,7 +79,7 @@ function (xhr, ajaxOptions, thrownError) {
       type: "POST",
       data: {'action':'busca_pacientes','fecha_pacientes':fecha_pacientes},
       dataType: "json",
-      url:'http://www.metabolicaschile.cl/pku_movil/wp-admin/admin-ajax.php',
+      url: url_ajax,
       beforeSend: function () {
                         jQuery("#resultado").html("Procesando, espere por favor...");
             },
@@ -95,20 +94,40 @@ function (xhr, ajaxOptions, thrownError) {
     e.preventDefault();
   }
 
-  function mostrarPacientes( aDatos )
-  {
-    if(aDatos[0].nombres !='Sin Datos'){
-      var op_nombres = '<div class="box_nom_campos"><label class="nom_campo" id="nro">Nro.</label><label class="nom_campo" id="nom">Nombre</label><label class="nom_campo aminoacidos">Fen</label><label class="nom_campo aminoacidos msud">Msud</label><label class="nom_campo aminoacidos">Tir</label><label class="nom_campo fech">F. Muestra</label></div>';
+  function mostrarPacientes( aDatos ) {
+    if (aDatos[0].nombres !='Sin Datos') {
+      var op_nombres = '<div class="box_nom_campos">'+
+      '<label class="nom_campo" id="nro">Nro.</label>'+
+      '<label class="nom_campo" id="nom">Nombre</label>'+
+      '<label class="nom_campo" id="estado">Estado</label>'+
+      '<label class="nom_campo aminoacidos">Fenil</label>'+
+      '<label class="nom_campo aminoacidos leu">Leu</label>'+
+      '<label class="nom_campo aminoacidos">Tir</label>'+
+      '<label class="nom_campo aminoacidos">Val</label>'+
+      '<label class="nom_campo aminoacidos">Iso</label>'+
+      '<label class="nom_campo aminoacidos">Allo</label>'+
+      '<label class="nom_campo fech">F. Muestra</label>'+
+      '</div>';
       for( var c=1; c <= aDatos.length; c++ )
       {
 
          op_nombres +='<div id="registro'+c+'" class="registro registro'+c+'" rel="'+c+'">';
          op_nombres +='<div class="numero"><label class="nro_paciente">'+c+'.</label><input type="checkbox" id="nro" name="nro'+c+'" value=""/></div>';
-         op_nombres +='<input type="hidden" name="id'+c+'" value="'+aDatos[c-1].id+'" /><label class="nombre'+c+' nombre" >'+aDatos[c-1].nombres+'</label><input type="text" class="amino fenil" value="'+aDatos[c-1].fenil+'" name="fenil'+c+'"><input type="text" class="amino msud" value="'+aDatos[c-1].msud+'" name="msud'+c+'"><input type="text" class="amino tir" value="'+aDatos[c-1].tir+'" name="tir'+c+'"><input type="text" name="fmuestra'+c+'" class="fmuestra fecha" value="'+aDatos[c-1].fmuestra+'" placeholder="dd-mm-aaaa"></div>';
+         op_nombres +='<input type="hidden" name="id'+c+'" value="'+aDatos[c-1].id+'" />'+
+         '<label class="nombre'+c+' nombre" >'+aDatos[c-1].nombres+'</label>'+
+         '<label class="estado">'+aDatos[c-1].estado+'</label>'+
+         '<input type="text" class="amino fenil" value="'+aDatos[c-1].fenil+'" name="fenil'+c+'">'+
+         '<input type="text" class="amino leu" value="'+aDatos[c-1].leu+'" name="leu'+c+'">'+
+         '<input type="text" class="amino tir" value="'+aDatos[c-1].tir+'" name="tir'+c+'">'+
+         '<input type="text" class="amino val" value="'+aDatos[c-1].val+'" name="val'+c+'">'+
+         '<input type="text" class="amino iso" value="'+aDatos[c-1].iso+'" name="iso'+c+'">'+
+         '<input type="text" class="amino allo" value="'+aDatos[c-1].allo+'" name="allo'+c+'">'+
+         '<input type="text" name="fmuestra'+c+'" class="fmuestra fecha" value="'+aDatos[c-1].fmuestra+'" placeholder="dd-mm-aaaa">'+
+         '</div>';
       }
        op_nombres +='<input type="button" name="enviar" id="enviar" value="Enviar Datos" onclick="actualiza_pacientes();" />';
        op_nombres +='<input type="button" name="eliminar" id="eliminar" value="Eliminar" onclick="eliminar_paciente();" />';
-    }else {
+    } else {
       op_nombres = 'Sin registros';
     }
 
@@ -137,24 +156,39 @@ function (xhr, ajaxOptions, thrownError) {
       }
       var id = new Array();
       var fenil = new Array();
-      var msud = new Array();
+      var leu = new Array();
       var tir = new Array();
+      var val = new Array();
+      var iso = new Array();
+      var allo = new Array();
       var fmuestra = new Array();
       var c = jQuery("#registros > .registro").length;
       for(j=1; j<=c; j++) {
         id[j-1] = jQuery('input[name="id'+j+'"]').val();
         fenil[j-1] = jQuery('input[name="fenil'+j+'"]').val();
-        msud[j-1] =jQuery('input[name="msud'+j+'"]').val();
+        leu[j-1] =jQuery('input[name="leu'+j+'"]').val();
         tir[j-1] = jQuery('input[name="tir'+j+'"]').val();
+        val[j-1] = jQuery('input[name="val'+j+'"]').val();
+        iso[j-1] = jQuery('input[name="iso'+j+'"]').val();
+        allo[j-1] = jQuery('input[name="allo'+j+'"]').val();
         fmuestra[j-1] =jQuery('input[name="fmuestra'+j+'"]').val();
       }
       jQuery("#log").text(' ');
       jQuery.ajax({
         type: "POST",
             cache: true,
-        data:
-        {'action':'actualizar_registros', 'id' : id, 'fenil' : fenil, 'msud' : msud, 'tir' : tir, 'fmuestra' : fmuestra},
-        url:'http://www.metabolicaschile.cl/pku_movil/wp-admin/admin-ajax.php',
+        data:{
+          'action':'actualizar_registros',
+          'id' : id,
+          'fenil' : fenil,
+          'leu' : leu,
+          'tir' : tir,
+          'val' : val,
+          'iso' : iso,
+          'allo' : allo,
+          'fmuestra' : fmuestra
+        },
+        url: url_ajax,
         dataType: "json",
         beforeSend: function () {
                    jQuery("#resultado").html("Procesando, espere por favor...");
@@ -197,7 +231,7 @@ function (xhr, ajaxOptions, thrownError) {
             cache: true,
         data:
         {'action':'eliminar_registros', 'id' : reg},
-        url:'http://www.metabolicaschile.cl/pku_movil/wp-admin/admin-ajax.php',
+        url: url_ajax,
         dataType: "json",
         beforeSend: function () {
                    jQuery("#resultado").html("Procesando, espere por favor...");

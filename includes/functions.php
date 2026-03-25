@@ -755,37 +755,80 @@ function responsive_add_class( $classes ) {
 	return $classes;
 }
 add_filter( 'body_class','responsive_add_class' );
-// Calcula la edad (formato: dia-mes-año)
+
+/****************** Calcula la edad (formato: dia-mes-aï¿½o) ************************/
 function sacar_edad($fecha){
-	if($fecha != ""){
-    list($d1,$m1,$y1) = explode ( "-", $fecha);
-    list($y2,$m2,$d2) = explode ( "-", date ("Y-m-d"));
+	if($fecha != "") {
+	    list($d1,$m1,$y1) = explode ( "-", $fecha);
+	    list($y2,$m2,$d2) = explode ( "-", date ("Y-m-d"));
+	    $mesDiff = $m2 - $m1;
 
-    $anos = (string)($y2 - $y1); // calculamos años
-    $meses = (string)($m2 - $m1); // calculamos meses
-    $edad = utf8_encode($anos." años ".$meses." meses");
+	    if ($mesDiff < 0) {
+	    	$mesDiff = -($mesDiff);
+	    }
 
-    if(($y2 - $y1) == 0)
-       $edad = utf8_encode($meses." meses");
+	    $anos = (string)($y2 - ($y1 + 1)); // calculamos aï¿½os
+	    $meses = (string)(12 - $mesDiff); // calculamos meses
+	    $edad = utf8_encode($anos." a&ntilde;os ".$meses." meses");
+
+	    if(($y2 - $y1) == 0) {
+	       $edad = utf8_encode($meses." meses");
+	   	}
+			
 		return ($edad);
-	}else{
+	} else {
 		return;
 	}
 }
 
 /*************** Funcion Todos los pacientes *****************************/
-$dbh = new wpdb( 'metaboli_admin', 'iRJ^Z,soGZni', 'metaboli_consulta', 'localhost');
+$dbh = new wpdb( 'metaboli_admin', 'Jww]$AOsFw.2', 'metaboli_consulta', 'localhost');
 
 function listar(){
 	global $dbh;	
   $mi_tabla = 'paciente';
-  $query = "SELECT * FROM $mi_tabla GROUP BY Nombre";
+  $query = "SELECT Nombre FROM $mi_tabla GROUP BY Nombre";
   $content = $dbh->get_results( $query );
   if ( count($content) > 0 ) {
     foreach ( $content as $row ) {
       $aDatos[] = array( 'Nombre' => ''.$row->Nombre.'');
     }
-  }else{
+  } else {
+    $aDatos = array();
+    $aDatos[] = array( 'Nombre' => 'Sin Datos');
+  }
+    echo json_encode($aDatos);
+  die();
+}
+add_action('wp_ajax_listar', 'listar');
+add_action('wp_ajax_nopriv_listar', 'listar');
+
+$aDatosEmpty[] = array(
+	'edad' => 'Sin Datos',
+	'fenil' => 'Sin Datos',
+	'tir' => 'Sin Datos',
+	'leu' => 'Sin Datos',
+	'val' => 'Sin Datos',
+	'iso' => 'Sin Datos',
+	'allo' => 'Sin Datos',
+	'estado' => 'Sin Datos',
+	'plectura' => 'Sin Datos',
+	'fecha_muestra' => 'Sin Datos' ,
+	'fecha_leche' => 'Sin Datos',
+	'fecha_control' => 'Sin Datos'
+);
+
+/*************** Funcion Todos los pacientes *****************************/
+function listar_pacientes(){
+	global $dbh;	
+  $mi_tabla = 'paciente_info';
+  $query = "SELECT Nombre FROM $mi_tabla";
+  $content = $dbh->get_results( $query );
+  if ( count($content) > 0 ) {
+    foreach ( $content as $row ) {
+      $aDatos[] = array( 'Nombre' => ''.$row->Nombre.'');
+    }
+  } else {
     $aDatos = array();
     $aDatos[] = array( 'Nombre' => 'Sin Datos');
   }
@@ -800,25 +843,78 @@ function pacientes(){
 	global $dbh;
 	$nom_paciente = $_POST['nom_paciente'];
 	$fecha_lectura = $_POST['fecha_lectura'];
+	$anio_lectura = $_POST['anio_lectura'];
+	$type = 'date';
+
 	$mi_tabla = 'paciente';
-	$query = "SELECT * FROM $mi_tabla WHERE Nombre='".$nom_paciente."' AND F_lectura='".$fecha_lectura."'";
+
+	if(isset($fecha_lectura)) {
+		$query = "SELECT * FROM $mi_tabla WHERE Nombre='".$nom_paciente."' AND F_lectura='".$fecha_lectura."'";
+	} else if(isset($anio_lectura)) {
+		$query = "SELECT * FROM $mi_tabla WHERE Nombre='".$nom_paciente."' AND Fecha_lectura LIKE '%".$anio_lectura."'";
+		$type = "year";
+	}
+
 	$content = $dbh->get_results( $query );
 	if ( count($content) > 0 ) {
-		foreach ( $content as $row ) {
-			$aDatos = array();
-			$edad=sacar_edad($row->Edad);
-			$aDatos[] = array( 'fenil' => ''.$row->Fenil.'', 'msud' => ''.$row->MSUD.'', 'edad' => ''.$edad.'', 'estado' => ''.$row->Estado.'','tir' => ''.$row->Tir.'', 'plectura' => ''.$row->prox_lectura.'', 'fleche' => ''.$row->fecha_entrega_leche.'', 'fmuestra' => ''.$row->fecha_toma_muestra.'', 'fcontrol' => ''.$row->fecha_control.'');
+		if($type == 'date') {
+			foreach ( $content as $row ) {
+				$aDatos = array();
+				$edad=sacar_edad($row->Edad);
+				$aDatos[] = array(
+					'fenil' => ''.$row->Fenil.'',
+					'leu' => ''.$row->Leu.'',
+					'tir' => ''.$row->Tir.'',
+					'val' => ''.$row->Val.'',
+					'iso' => ''.$row->Iso.'',
+					'allo' => ''.$row->Allo.'',
+					'edad' => ''.$edad.'',
+					'estado' => ''.$row->Estado.'',
+					'plectura' => ''.$row->prox_lectura.'',
+					'fleche' => ''.$row->fecha_entrega_leche.'',
+					'fmuestra' => ''.$row->fecha_toma_muestra.'',
+					'fcontrol' => ''.$row->fecha_control.''
+				);
+			}
+		} else if ($type == 'year') {
+			$aDatos = array('data' => 'years');
+			$aDatos['rows'] = array();
+
+			foreach ($content as $key => $row) {
+				$aDatos['rows'][$key] = array(
+					'fenil' => ''.$row->Fenil.'',
+					'leu' => ''.$row->Leu.'',
+					'tir' => ''.$row->Tir.'',
+					'val' => ''.$row->Val.'',
+					'iso' => ''.$row->Iso.'',
+					'allo' => ''.$row->Allo.'',
+				);
+			}
 		}
-	}else{
+	} else {
 		$aDatos = array();
-		$aDatos[] = array(  'edad' => 'Sin Datos', 'fenil' => 'Sin Datos', 'tir' => 'Sin Datos', 'msud' => 'Sin Datos', 'estado' => 'Sin Datos', 'plectura' => 'Sin Datos', 'fecha_muestra' => 'Sin Datos' , 'fecha_leche' => 'Sin Datos', 'fecha_control' => 'Sin Datos');
+		$aDatos[] = array(
+			'edad' => 'Sin Datos',
+			'fenil' => 'Sin Datos',
+			'tir' => 'Sin Datos',
+			'leu' => 'Sin Datos',
+			'val' => 'Sin Datos',
+			'iso' => 'Sin Datos',
+			'allo' => 'Sin Datos',
+			'estado' => 'Sin Datos',
+			'plectura' => 'Sin Datos',
+			'fecha_muestra' => 'Sin Datos' ,
+			'fecha_leche' => 'Sin Datos',
+			'fecha_control' => 'Sin Datos'
+		);
 	}
+
     echo json_encode($aDatos);
 	die();
 }
 add_action('wp_ajax_pacientes', 'pacientes');
 add_action('wp_ajax_nopriv_pacientes', 'pacientes');
-/*************** Funcion Consulta Datos Pacientes *****************************/
+/*************** Funcion Editar Pacientes *****************************/
 function edita_pacientes(){
 	global $dbh;
 	$nom_paciente = $_POST['nom_paciente'];
@@ -829,18 +925,32 @@ function edita_pacientes(){
 		foreach ( $content as $row ) {
 			$aDatos = array();
 			$edad=sacar_edad($row->Edad);
-			$aDatos[] = array( 'fenil' => ''.$row->Fenil.'', 'msud' => ''.$row->MSUD.'', 'edad' => ''.$edad.'', 'fnac' => ''.$row->Edad.'', 'estado' => ''.$row->Estado.'','tir' => ''.$row->Tir.'', 'plectura' => ''.$row->prox_lectura.'', 'fleche' => ''.$row->fecha_entrega_leche.'', 'fmuestra' => ''.$row->fecha_toma_muestra.'', 'fcontrol' => ''.$row->fecha_control.'');
+			$aDatos[] = array(
+				'fenil' => ''.$row->Fenil.'',
+				'leu' => ''.$row->Leu.'',
+				'tir' => ''.$row->Tir.'',
+				'val' => ''.$row->Val.'',
+				'iso' => ''.$row->Iso.'',
+				'allo' => ''.$row->Allo.'',
+				'edad' => ''.$edad.'',
+				'fnac' => ''.$row->Edad.'',
+				'estado' => ''.$row->Estado.'',
+				'plectura' => ''.$row->prox_lectura.'',
+				'fleche' => ''.$row->fecha_entrega_leche.'',
+				'fmuestra' => ''.$row->fecha_toma_muestra.'',
+				'fcontrol' => ''.$row->fecha_control.''
+			);
 		}
-	}else{
+	} else {
 		$aDatos = array();
-		$aDatos[] = array(  'edad' => 'Sin Datos', 'fenil' => 'Sin Datos', 'tir' => 'Sin Datos', 'msud' => 'Sin Datos', 'estado' => 'Sin Datos', 'plectura' => 'Sin Datos', 'fecha_muestra' => 'Sin Datos' , 'fecha_leche' => 'Sin Datos', 'fecha_control' => 'Sin Datos');
+		$aDatos[] = $aDatosEmpty;
 	}
     echo json_encode($aDatos);
 	die();
 }
 add_action('wp_ajax_edita_pacientes', 'edita_pacientes');
 add_action('wp_ajax_nopriv_edita_pacientes', 'edita_pacientes');
-/*************** Funcion Buscar Pacientes *****************************/
+/*************** Funcion Update Pacientes *****************************/
 function update_pacientes(){
 	global $dbh;
 	$flectura = $_POST['fecha_pacientes'];
@@ -850,11 +960,24 @@ function update_pacientes(){
 	if ( count($content) > 0 ) {
 		foreach ( $content as $row ) {
 			$aDatos = array();
-			$aDatos[] = array( 'edad' => ''.$row->Edad.'', 'fenil' => ''.$row->Fenil.'', 'tir' => ''.$row->Tir.'', 'msud' => ''.$row->MSUD.'', 'estado' => ''.$row->Estado.'', 'plectura' => ''.$row->prox_lectura.'', 'fecha_muestra' => ''.$row->fecha_toma_muestra.'' , 'fecha_leche' => ''.$row->fehca_entrega_leche.'', 'fecha_control' => ''.$row->fecha_control.'');
+			$aDatos[] = array(
+				'edad' => ''.$row->Edad.'',
+				'fenil' => ''.$row->Fenil.'',
+				'tir' => ''.$row->Tir.'',
+				'leu' => ''.$row->Leu.'',
+				'val' => ''.$row->Val.'',
+				'iso' => ''.$row->Iso.'',
+				'allo' => ''.$row->Allo.'',
+				'estado' => ''.$row->Estado.'',
+				'plectura' => ''.$row->prox_lectura.'',
+				'fecha_muestra' => ''.$row->fecha_toma_muestra.'',
+				'fecha_leche' => ''.$row->fehca_entrega_leche.'',
+				'fecha_control' => ''.$row->fecha_control.''
+			);
 		}
-	}else{
+	} else {
 		$aDatos = array();
-		$aDatos[] = array(  'edad' => 'Sin Datos', 'fenil' => 'Sin Datos', 'tir' => 'Sin Datos', 'msud' => 'Sin Datos', 'estado' => 'Sin Datos', 'plectura' => 'Sin Datos', 'fecha_muestra' => 'Sin Datos' , 'fecha_leche' => 'Sin Datos', 'fecha_control' => 'Sin Datos');
+		$aDatos[] = $aDatosEmpty;
 	}
     echo json_encode($aDatos);
 	die();
@@ -886,29 +1009,33 @@ add_action('wp_ajax_nopriv_fechas', 'fechas');
 /*************** Funcion Ingresa paciente *****************************/
 function ingreso_pacientes(){
 	global $dbh;
+  $rut_paciente = $_POST['rut_paciente'];
   $nom_paciente = $_POST['nom_paciente'];
   $fecha_lectura = $_POST['flectura'];
   $fenil = $_POST['fenil'];
   $tir = $_POST['tir'];
-  $msud = $_POST['msud'];
+  $leu = $_POST['leu'];
+  $val = $_POST['val'];
+  $iso = $_POST['iso'];
+  $allo = $_POST['allo'];
   $fmuestra = $_POST['fmuestra'];
   $count = sizeof($nom_paciente);
   $aDatos = array();
   for($x = 0; $x < $count; $x++) {
   		if ($fenil[$x] == 'Fenil')
   				$fenil[$x] = '';
-  		if ($msud[$x] == 'MSUD')
-  				$msud[$x] = '';
+  		if ($leu[$x] == 'Leu')
+  				$leu[$x] = '';
   		if ($tir[$x] == 'Tir')
   				$tir[$x] = '';
   		if ($fmuestra[$x] == 'Ej:dd-mm-aaaa')
   				$fmuestra[$x] = '';
-		$query = "INSERT INTO paciente (`Nombre`,`Fecha_lectura`, `F_lectura`, `Fenil`, `Tir`, `MSUD`, `fecha_toma_muestra`) VALUES ('".$nom_paciente[$x]."', '".$fecha_lectura[$x]."', STR_TO_DATE('".$fecha_lectura[$x]."', '%d-%m-%Y'), '".$fenil[$x]."', '".$tir[$x]."', '".$msud[$x]."', '".$fmuestra[$x]."')";
+		$query = "INSERT INTO paciente (`Rut`,`Nombre`,`Fecha_lectura`, `F_lectura`, `Fenil`, `Tir`, `Leu`, `Val`, `Iso`, `Allo`,`fecha_toma_muestra`) VALUES ('".$rut_paciente[$x]."', '".$nom_paciente[$x]."', '".$fecha_lectura[$x]."', STR_TO_DATE('".$fecha_lectura[$x]."', '%d-%m-%Y'), '".$fenil[$x]."', '".$tir[$x]."', '".$leu[$x]."', '".$val[$x]."', '".$iso[$x]."', '".$allo[$x]."', '".$fmuestra[$x]."')";
 		$content = $dbh->query( $query );
 		if ( $content > 0 ) {
 				$j = $x + 1;
 				$aDatos[$x] = 'Paciente '.$j.' ingresado';
-		}else{
+		} else {
 			$j = $x + 1;
 			$aDatos[$x] = 'Paciente '.$j.' ya ingresado';
 		}
@@ -924,14 +1051,15 @@ add_action('wp_ajax_nopriv_ingreso_pacientes', 'ingreso_pacientes');
 function historial(){
 	global $dbh;
 	$nom_paciente = $_POST['nom_paciente'];
+	$rut_paciente = $_POST['rut_paciente'];
 	$fecha_paciente = $_POST['fecha_paciente'];
 	$tipo = $_POST['tipo'];
 	$mi_tabla = 'paciente';
-	if($tipo == 'nombre'){
-		$query = "SELECT * FROM $mi_tabla WHERE Nombre='".$nom_paciente."' ORDER BY F_lectura ASC";
-    $query2 = "SELECT * FROM $mi_tabla WHERE Nombre='".$nom_paciente."' and f_nac is not null Order by f_nac DESC";
-    $content2 = $dbh->get_results( $query2 );
-	}else {
+	if ($tipo == 'nombre') {
+		$query = "SELECT * FROM $mi_tabla WHERE Nombre='".$nom_paciente."' AND Rut='".$rut_paciente."' ORDER BY F_lectura ASC";
+    	$query2 = "SELECT * FROM paciente_info WHERE Nombre='".$nom_paciente."' AND Rut='".$rut_paciente."' AND f_nac is not null Order by f_nac DESC";
+    	$content2 = $dbh->get_results( $query2 );
+	} else {
 		$query = "SELECT * FROM $mi_tabla WHERE F_lectura='".$fecha_paciente."' ORDER BY F_lectura ASC";
 	}
 
@@ -939,17 +1067,34 @@ function historial(){
 	if ( count($content) > 0 ) {
 		$aDatos = array();
 
-    if ( count($content2) > 0 ) {
-      foreach ( $content2 as $row2 ) {
-        $edad=sacar_edad($row2->f_nac);
-        break;
-       }
-    }
-
-		foreach ( $content as $row ) {
-			$aDatos[] = array( 'tipo' => ''.$tipo.'','nombre' => ''.$row->Nombre.'', 'edad' => ''.$edad.'', 'fenil' => ''.$row->Fenil.'', 'msud' => ''.$row->MSUD.'', 'estado' => ''.$row->Estado.'','tir' => ''.$row->Tir.'', 'flectura' => ''.$row->Fecha_lectura.'', 'plectura' => ''.$row->prox_lectura.'', 'fleche' => ''.$row->fecha_entrega_leche.'', 'fmuestra' => ''.$row->fecha_toma_muestra.'', 'fcontrol' => ''.$row->fecha_control.'', 'fsort' => ''.$row->F_lectura.'');
+		if ( isset($content2) && count($content2) > 0 ) {
+			foreach ( $content2 as $row2 ) {
+				$edad=sacar_edad($row2->f_nac);
+				break;
+			}
 		}
-	}else{
+		foreach ( $content as $row ) {
+			$aDatos[] = array(
+				'tipo' => ''.$tipo.'',
+				'nombre' => ''.$row->Nombre.'',
+				'rut' => ''.$row->Rut.'',
+				'edad' => ''.$edad.'',
+				'fenil' => ''.$row->Fenil.'',
+				'leu' => ''.$row->Leu.'',
+				'tir' => ''.$row->Tir.'',
+				'val' => ''.$row->Val.'',
+				'iso' => ''.$row->Iso.'',
+				'allo' => ''.$row->Allo.'',
+				'estado' => ''.$row->Estado.'',
+				'flectura' => ''.$row->Fecha_lectura.'',
+				'plectura' => ''.$row->prox_lectura.'',
+				'fleche' => ''.$row->fecha_entrega_leche.'',
+				'fmuestra' => ''.$row->fecha_toma_muestra.'',
+				'fcontrol' => ''.$row->fecha_control.'',
+				'fsort' => ''.$row->F_lectura.''
+			);
+		}
+	} else {
 		$aDatos = array();
 		$aDatos[] = array( 'fechas' => 'Sin Datos');
 	}
@@ -959,17 +1104,89 @@ function historial(){
 add_action('wp_ajax_historial', 'historial');
 add_action('wp_ajax_nopriv_historial', 'historial');
 
+/*************** Funcion Consulta Historial por paciente *****************************/
+function historial_paciente(){
+	global $dbh;
+	$nom_paciente = $_POST['nom_paciente'];
+	$fecha_paciente = $_POST['fecha_paciente'];
+	$tipo = $_POST['tipo'];
+	$mi_tabla = 'paciente';
+	if($tipo == 'nombre'){
+		$query = "SELECT * FROM $mi_tabla WHERE Nombre='".$nom_paciente."' ORDER BY F_lectura ASC";
+    	$query2 = "SELECT * FROM paciente_info WHERE Nombre='".$nom_paciente."' AND f_nac is not null Order by f_nac DESC";
+    	$content2 = $dbh->get_results( $query2 );
+	} else {
+		$query = "SELECT * FROM $mi_tabla WHERE F_lectura='".$fecha_paciente."' ORDER BY F_lectura ASC";
+	}
+
+	$content = $dbh->get_results( $query );
+	if ( count($content) > 0 ) {
+		$aDatos = array();
+
+		if (isset($content2) && count($content2) > 0 ) {
+			foreach ( $content2 as $row2 ) {
+				$edad=sacar_edad($row2->f_nac);
+				break;
+			}
+		}
+		foreach ( $content as $row ) {
+			$aDatos[] = array(
+				'tipo' => ''.$tipo.'',
+				'nombre' => ''.$row->Nombre.'',
+				'rut' => ''.$row->Rut.'',
+				'edad' => ''.$edad.'',
+				'fenil' => ''.$row->Fenil.'',
+				'leu' => ''.$row->Leu.'',
+				'tir' => ''.$row->Tir.'',
+				'val' => ''.$row->Val.'',
+				'iso' => ''.$row->Iso.'',
+				'allo' => ''.$row->Allo.'',
+				'estado' => ''.$row->Estado.'',
+				'flectura' => ''.$row->Fecha_lectura.'',
+				'plectura' => ''.$row->prox_lectura.'',
+				'fleche' => ''.$row->fecha_entrega_leche.'',
+				'fmuestra' => ''.$row->fecha_toma_muestra.'',
+				'fcontrol' => ''.$row->fecha_control.'',
+				'fsort' => ''.$row->F_lectura.''
+			);
+		}
+	} else {
+		$aDatos = array();
+		$aDatos[] = array( 'fechas' => 'Sin Datos');
+	}
+    echo json_encode($aDatos);
+	die();
+}
+add_action('wp_ajax_historial_paciente', 'historial_paciente');
+add_action('wp_ajax_nopriv_historial_paciente', 'historial_paciente');
+
 /*************** Funcion Buscar Pacientes *****************************/
 function busca_pacientes(){
 	global $dbh;
 	$flectura = $_POST['fecha_pacientes'];
 	$mi_tabla = 'paciente';
-	$query = "SELECT * FROM $mi_tabla WHERE Fecha_lectura='".$flectura."' ORDER BY Nombre ASC";
+	$query = "SELECT * FROM $mi_tabla WHERE `Fecha_lectura` Like '%".$flectura."%' ORDER BY F_lectura ASC";
 	$content = $dbh->get_results( $query );
 	if ( count($content) > 0 ) {
 	   $aDatos = array();
 		foreach ( $content as $row ) {
-			$aDatos[] = array('id' => ''.$row->id.'', 'nombres' => ''.$row->Nombre.'', 'fenil' => ''.$row->Fenil.'', 'msud' => ''.$row->MSUD.'', 'estado' => ''.$row->Estado.'','tir' => ''.$row->Tir.'', 'plectura' => ''.$row->prox_lectura.'', 'fleche' => ''.$row->fecha_entrega_leche.'', 'fmuestra' => ''.$row->fecha_toma_muestra.'', 'fcontrol' => ''.$row->fecha_control.'', 'flectura' => ''.$row->F_lectura.'');
+			$aDatos[] = array(
+				'id' => ''.$row->id.'',
+				'rut' => ''.$row->Rut.'',
+				'nombres' => ''.$row->Nombre.'',
+				'fenil' => ''.$row->Fenil.'',
+				'leu' => ''.$row->Leu.'',
+				'tir' => ''.$row->Tir.'',
+				'val' => ''.$row->Val.'',
+				'iso' => ''.$row->Iso.'',
+				'allo' => ''.$row->Allo.'',
+				'estado' => ''.$row->Estado.'',
+				'plectura' => ''.$row->prox_lectura.'',
+				'fleche' => ''.$row->fecha_entrega_leche.'',
+				'fmuestra' => ''.$row->fecha_toma_muestra.'',
+				'fcontrol' => ''.$row->fecha_control.'',
+				'flectura' => ''.$row->F_lectura.''
+			);
 		}
 	}else{
 		$aDatos = array();
@@ -988,14 +1205,17 @@ function actualiza_pacientes(){
 	$flectura = $_POST['flectura'];
 	$fenil = $_POST['fenil'];
 	$tir = $_POST['tir'];
-	$msud = $_POST['msud'];
+	$leu = $_POST['leu'];
+	$val = $_POST['val'];
+	$iso = $_POST['iso'];
+	$allo = $_POST['allo'];
 	$fnac = $_POST['fnac'];
 	$estado = $_POST['estado'];
 	$plectura = $_POST['plectura'];
 	$fleche = $_POST['fleche'];
 	$fmuestra = $_POST['fmuestra'];
 	$fcontrol = $_POST['fcontrol'];
-	$query = 'UPDATE paciente SET f_nac="'.$fnac.'", Fenil="'.$fenil.'", MSUD="'.$msud.'", Estado="'.$estado.'", Tir="'.$tir.'", prox_lectura="'.$plectura.'", fecha_entrega_leche="'.$fleche.'", fecha_toma_muestra="'.$fmuestra.'", fecha_control="'.$fcontrol.'" WHERE Nombre="'.$nom_paciente.'" AND Fecha_lectura="'.$flectura.'"';
+	$query = 'UPDATE paciente SET f_nac="'.$fnac.'", Fenil="'.$fenil.'", Leu="'.$leu.'", Val="'.$val.'", Iso="'.$iso.'", Allo="'.$allo.'"Estado="'.$estado.'", Tir="'.$tir.'", prox_lectura="'.$plectura.'", fecha_entrega_leche="'.$fleche.'", fecha_toma_muestra="'.$fmuestra.'", fecha_control="'.$fcontrol.'" WHERE Nombre="'.$nom_paciente.'" AND Fecha_lectura="'.$flectura.'"';
   $content = $dbh->query( $query );
 	if ( $content > 0 ) {
 			$aDatos = array();
@@ -1045,13 +1265,16 @@ function actualizar_registros(){
 	global $dbh;
   $id = $_POST['id'];
   $fenil = $_POST['fenil'];
-  $msud = $_POST['msud'];
+  $leu = $_POST['leu'];
   $tir = $_POST['tir'];
+  $val = $_POST['val'];
+  $iso = $_POST['iso'];
+  $allo = $_POST['allo'];
   $fmuestra = $_POST['fmuestra'];
   $count = sizeof($id);
   $aDatos = array();
   for($x = 0; $x < $count; $x++) {
-    $query = 'UPDATE paciente SET Fenil="'.$fenil[$x].'", MSUD="'.$msud[$x].'", Tir="'.$tir[$x].'", fecha_toma_muestra="'.$fmuestra[$x].'" WHERE id="'.$id[$x].'"';
+    $query = 'UPDATE paciente SET Fenil="'.$fenil[$x].'", Leu="'.$leu[$x].'", Val="'.$val[$x].'", Iso="'.$iso[$x].'", Allo="'.$allo[$x].'",Tir="'.$tir[$x].'", fecha_toma_muestra="'.$fmuestra[$x].'" WHERE id="'.$id[$x].'"';
     $content = $dbh->query( $query );
     if ( $content > 0 ) {
         $j = $x + 1;
@@ -1072,19 +1295,19 @@ add_action('wp_ajax_nopriv_actualizar_registros', 'actualizar_registros');
 function busca_datos(){
 	global $dbh;
   $nom_paciente = $_POST['nom_paciente'];
-  $query = "SELECT * FROM paciente WHERE Nombre='".$nom_paciente."' Order by f_nac DESC";
+  $query = "SELECT * FROM paciente_info WHERE Nombre='".$nom_paciente."' Order by f_nac DESC";
   $content = $dbh->get_results( $query );
   if ( count($content) > 0 ) {
      $aDatos = array();
 
     foreach ( $content as $row ) {
       $edad=sacar_edad($row->f_nac);
-      $aDatos[] = array('nombres' => ''.$row->Nombre.'', 'edad' => ''.$edad.'', 'fnac' => ''.$row->f_nac.'' );
+      $aDatos[] = array('rut' => ''.$row->Rut.'', 'nombres' => ''.$row->Nombre.'', 'edad' => ''.$edad.'', 'fnac' => ''.$row->f_nac.'' );
       break;
     }
   }else{
     $aDatos = array();
-    $aDatos[] = array(  'nombres' => 'Sin Datos', 'edad' => ''.$edad.'', 'fnac' => 'Sin Datos');
+    $aDatos[] = array('rut' => 'Sin Datos', 'nombres' => 'Sin Datos', 'edad' => ''.$edad.'', 'fnac' => 'Sin Datos');
   }
     echo json_encode($aDatos);
   die();
@@ -1092,13 +1315,40 @@ function busca_datos(){
 add_action('wp_ajax_busca_datos', 'busca_datos');
 add_action('wp_ajax_nopriv_busca_datos', 'busca_datos');
 
-/***************************** Funcion Actuliza pacientes (Editar)  *******************************/
+/***************************** Funcion Agregar paciente (Crear/ Editar)  *******************************/
+function agrega_paciente(){
+	global $dbh;
+  $nombre = $_POST['nombre'];
+  $rut = $_POST['rut'];
+  $fnac = $_POST['fnac'];
+  $query = "INSERT INTO paciente_info (`Rut`,`Nombre`,`f_nac`) VALUES ('".$rut."', '".$nombre."', '".$fnac."')";
+  if ($nombre != '') {
+	  $content = $dbh->query( $query );
+	  if ( $content > 0 ) {
+	      $aDatos = array();
+	      $aDatos[] = array( 'Paciente' => 'Paciente Agregado');
+	  } else {
+	    $aDatos = array();
+	    $aDatos[] = array(  'Paciente' => 'Error',  'Error' => ''.$dbh->last_error.'' );
+	  }
+	} else {
+    $aDatos = array();
+	  $aDatos[] = array(  'Paciente' => 'Debe Ingresar: Nombre');
+	}
+	echo json_encode($aDatos);
+  die();
+}
+add_action('wp_ajax_agrega_paciente', 'agrega_paciente');
+add_action('wp_ajax_nopriv_agrega_paciente', 'agrega_paciente');
+
+/***************************** Funcion Actuliza pacientes (Crear / Editar)  *******************************/
 function actualiza_paciente(){
 	global $dbh;
   $nombre_a = $_POST['nombre_antiguo'];
   $nombre_n = $_POST['nombre_nuevo'];
+  $rut = $_POST['rut'];
   $fnac = $_POST['fnac'];
-  $query = 'UPDATE paciente SET Nombre="'.$nombre_n.'", f_nac="'.$fnac.'" WHERE Nombre="'.$nombre_a.'"';
+  $query = 'UPDATE paciente_info SET Rut="'.$rut.'", Nombre="'.$nombre_n.'", f_nac="'.$fnac.'" WHERE Nombre="'.$nombre_a.'"';
   $content = $dbh->query( $query );
   if ( $content > 0 ) {
       $aDatos = array();

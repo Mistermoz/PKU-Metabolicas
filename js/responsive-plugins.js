@@ -2,14 +2,14 @@
  * Responsive JS Plugins v1.2.2
  */
 // Placeholder
-jQuery(function(){
+/* jQuery(function(){
     jQuery('input[placeholder], textarea[placeholder]').placeholder();
 });
 // FitVids
 jQuery(document).ready(function(){
 // Target your #container, #wrapper etc.
     jQuery("#wrapper").fitVids();
-});
+}); */
 
 // Have a custom video player? We now have a customSelector option where you can add your own specific video vendor selector (mileage may vary depending on vendor and fluidity of player):
 // jQuery("#thing-with-videos").fitVids({ customSelector: "iframe[src^='http://example.com'], iframe[src^='http://example.org']"});

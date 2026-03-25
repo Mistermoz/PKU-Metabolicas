@@ -23,7 +23,7 @@ global $more; $more = 0;
 <div id="content-blog" class="<?php echo implode( ' ', responsive_get_content_classes() ); ?>">
 <?php if (!(current_user_can('level_0'))){ ?>
 	<h2>Acceso Usuarios</h2>
-		<form action="<?php echo get_option('home'); ?>/wp-login.php" method="post" id="acceso_usuario">
+		<form action="<?php echo home_url(); ?>/wp-login.php" method="post" id="acceso_usuario">
 			<input type="text" name="log" id="log" value="<?php echo wp_specialchars(stripslashes($user_login), 1) ?>" size="20" placeholder="Usuario"/>
 			<input type="password" name="pwd" id="pwd" size="20" placeholder="Contrase&ntilde;a"/>
 			<input type="submit" name="submit" value="Enviar" class="button" />
@@ -32,7 +32,7 @@ global $more; $more = 0;
        <input type="hidden" name="redirect_to" value="<?php echo $_SERVER['REQUEST_URI']; ?>" />
     </p>
 </form>
-<a href="<?php echo get_option('home'); ?>/wp-login.php?action=lostpassword">Recuperar Contrase&ntilde;a</a>
+<a href="<?php echo home_url(); ?>/wp-login.php?action=lostpassword">Recuperar Contrase&ntilde;a</a>
 <?php } else {
 	  global $current_user;
       get_currentuserinfo();
@@ -44,5 +44,4 @@ global $more; $more = 0;
 
 </div><!-- end of #content-blog -->
 
-<?php// get_sidebar(); ?>
 <?php get_footer(); ?>

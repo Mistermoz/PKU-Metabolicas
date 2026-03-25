@@ -91,7 +91,7 @@ function (xhr, ajaxOptions, thrownError) {
 			type: "POST",
 			data: {'action':'edita_pacientes','nom_paciente':nom_paciente , 'flectura':flectura},
 			dataType: "json",
-			url:'http://www.metabolicaschile.cl/pku_movil/wp-admin/admin-ajax.php',
+			url: url_ajax,
 			beforeSend: function () {
                         jQuery("#resultado").html("Procesando, espere por favor...");
             },
@@ -109,7 +109,7 @@ function (xhr, ajaxOptions, thrownError) {
 			type: "POST",
 			data: {'action':'busca_pacientes','fecha_pacientes':fecha_pacientes},
 			dataType: "json",
-			url:'http://www.metabolicaschile.cl/pku_movil/wp-admin/admin-ajax.php',
+			url: url_ajax,
 			beforeSend: function () {
                         jQuery("#resultado").html("Procesando, espere por favor...");
             },
@@ -124,7 +124,7 @@ function (xhr, ajaxOptions, thrownError) {
 			var flectura = jQuery('#flectura').val();
 			var fenil = jQuery('#fenil').val();
 			var tir = jQuery('#tir').val();
-			var msud = jQuery('#msud').val();
+			var leu = jQuery('#leu').val();
 			var estado = jQuery('#estado').val();
 			var plectura = jQuery('#plectura').val();
 			var fleche = jQuery('#fleche').val();
@@ -134,9 +134,9 @@ function (xhr, ajaxOptions, thrownError) {
 			jQuery.ajax({
 				type: "POST",
 				data:
-				{'action':'actualiza_pacientes','nom_paciente':nom_paciente,'flectura':flectura ,'fenil':fenil,'tir':tir,'msud':msud,'estado':estado,'plectura':plectura,'fleche':fleche,'fmuestra':fmuestra, 'fcontrol':fcontrol, 'fnac':fnac },
+				{'action':'actualiza_pacientes','nom_paciente':nom_paciente,'flectura':flectura ,'fenil':fenil,'tir':tir,'leu':leu,'estado':estado,'plectura':plectura,'fleche':fleche,'fmuestra':fmuestra, 'fcontrol':fcontrol, 'fnac':fnac },
 				dataType: "json",
-				url:'http://www.metabolicaschile.cl/pku_movil/wp-admin/admin-ajax.php',
+				url: url_ajax,
 				beforeSend: function () {
                    jQuery("#resultado").html("Procesando, espere por favor...");
 				},
@@ -163,7 +163,7 @@ function (xhr, ajaxOptions, thrownError) {
 			campos +='<label for="Fnac">Fecha de Nac.:</label><input clasS="fecha" type="text" name="fnac" id="fnac" value="'+aDatos[contador].fnac+'" /><br />';
 			campos +='<label for="Fenil">Fenil.:</label><input type="text" name="fenil" id="fenil" value="'+aDatos[contador].fenil+'" /><br />';
 			campos +='<label for="tir">Tirosina:</label><input type="text" name="tir" id="tir" value="'+aDatos[contador].tir+'"  /><br />';
-			campos +='<label for="msud">MSUD:</label><input type="text" name="msud" id="msud" value="'+aDatos[contador].msud+'" /><br />';
+			campos +='<label for="leu">Leu:</label><input type="text" name="leu" id="leu" value="'+aDatos[contador].leu+'" /><br />';
 			campos +='<label for="estado">Estado:</label><input type="text" name="estado" id="estado" value="'+aDatos[contador].estado+'" /><br />';
 			campos +='<label for="plectura">P. Lectura:</label><input type="text" clasS="fecha" name="plectura" id="plectura" value="'+aDatos[contador].plectura+'"  />';
 			campos +='<label for="Fecha_Leche">Fecha Leche:</label><br><input type="text" clasS="fecha" name="fleche" id="fleche" value="'+aDatos[contador].fleche+'" placeholder="Ej:dd-mm-aaaa"/><br>';

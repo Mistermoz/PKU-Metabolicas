@@ -3216,123 +3216,130 @@ BDO[DIR="rtl"] {
 	margin-top: 0px;
 }
 /******************************************* Ingreso Usuarios***************************************************************/
-.post-31 .box_nom_campos{
-	width:100%;
-	clear:both;
-	height:60px;
+.ingresa-lec .box_nom_campos{
+	clear: both;
+	height: 60px;
+	width: 100%;
 }
-.post-31 .nom_campos{
-	float:left;
-	margin-right:10px;
+.ingresa-lec .nom_campos{
+	float: left;
+	margin-right: 10px;
 }
-.post-31 label{
-	float:left;
+.ingresa-lec label{
+	float: left;
 	padding: 1.15%;
-	text-align:center;
-}
-.post-31 .box_nom_campos label{
-	border:1px solid #ccc;
-}
-.post-31  input[type="radio"]{
-	float:left;
-	margin:22px 10px;
-}
-.post-31 .fenil, .post-31 .tiro, .post-31 .msud{
-	width:8%;
-	margin-right:8px;
-	float:left;
-}
-.post-31 #nom{
-	width: 35%;
-}
-.post-31 .nombre,.post-31 #el_paciente_chzn{
-	width: 99% !important;
-	margin-right:8px;
-	float:left;
-	display:none;
-	height:32px;
-}
-.post-31 .nombre_none{
-	border: 1px solid red;
-}
-.post-31 .fecha{
-	float:left;
-	margin-right:8px;
 	text-align: center;
-	width:18.7%;
 }
-
-.post-31 .fmuestra{
-	margin-right:0px;
+.ingresa-lec .box_nom_campos label{
+	border: 1px solid #ccc;
 }
-
-.post-31 .fecha_none{
+.ingresa-lec  input[type="radio"]{
+	float: left;
+	margin: 22px 10px;
+}
+.ingresa-lec .fenil, .ingresa-lec .tiro, .ingresa-lec .leu{
+	width: 6.7%;
+	margin-right: 8px;
+	float: left;
+}
+.ingresa-lec .nombre, .ingresa-lec #el_paciente_chzn{
+	float: left;
+	display: none;
+	height: 30px;
+	width: 100%;
+}
+.ingresa-lec .nombre_none{
 	border: 1px solid red;
 }
-
-.post-31 #flec, .post-31 #fmues{
-	width: 16.3%;
+.ingresa-lec .fecha{
+	float: left;
+	margin-right: 8px;
+	text-align: center;
+	width: 14.9%;
 }
-.post-31 #tir, .post-31 #fen{
-	width: 7%;
+.ingresa-lec .fmuestra{
+	margin-right: 0px;
 }
-.post-31 #nro{
+.ingresa-lec .fecha_none{
+	border: 1px solid red;
+}
+.ingresa-lec #nro{
 	width: 3%;
 }
-.post-31 .msud{
-	width: 8%;
-	margin-right:8px;
+.ingresa-lec #rut_nom{
+	width: 10%;
+}
+.ingresa-lec #nom{
+	width: 32.7%;
+}
+.ingresa-lec #flec, .ingresa-lec #fmues{
+	width: 13.3%;
+}
+.ingresa-lec #tir, .ingresa-lec #fen, .ingresa-lec #leu{
+	width: 5%;
+}
+.ingresa-lec #leu{
 	display:none;
+}
+.ingresa-lec .leu{
+	width: 6.8%;
+	margin-right: 8px;
+	display: none;
+	float: left;
+}
+.ingresa-lec  input[name="paciente"]{
+	float: left;
+	margin: 10px 10px;
+}
+.ingresa-lec label.elige_paciente{
 	float:left;
+	padding: 7px;
+	text-align: center;
+	margin: 0px 0px 0px 46px;
 }
-.post-31 #msud{
-	width: 7%;
-	display:none;
+.ingresa-lec .box_paciente{
+	float: left;
+	height: 30px;
+	margin-right: 8px;
+	width: 34.5%;
 }
-.post-31  input[name="paciente"]{
-	float:left;
-	margin:10px 10px;
-}
-.post-31 label.elige_paciente{
-	float:left;
-	padding:7px;
-	text-align:center;
-	margin:0px 0px 0px 46px;
-}
-.post-31 .box_paciente{
-	width: 37.5%;
-	float:left;
-	height:30px;
-}
-.post-31 .registro{
+.ingresa-lec .registro{
 	height:40px;
 	width:100%;
 }
-.box_inputs{
-	clear: both;
-	height:1%;
-}
-#paciente_ejemplo{
-	display:none;
-}
-.registro{
-	display:block
-}
-.post-31 .numero{
+.ingresa-lec .numero{
 	float: left;
 	height: 30px;
 	width: 5.5%;
 }
-.post-31 .numero label{
-	padding:7px;
-	text-align:center;
-	margin:0;
+.ingresa-lec .numero label{
+	padding: 7px;
+	text-align: center;
+	margin: 0;
 }
-.post-31 .numero input[type="checkbox"]{
+.ingresa-lec .numero input[type="checkbox"]{
 	float:left;
 	height: 12px;
-	margin:10px 0px;
+	margin: 10px 0px;
 	width: 12px;
+}
+.ingresa-lec .rut {
+	float: left;
+	margin-right: 8px;
+	width: 12%;
+}
+.ingresa-lec .box_inputs{
+	clear: both;
+	height:1%;
+}
+.ingresa-lec .link-agregar-paciente {
+	text-align: left;
+}
+#paciente_ejemplo, #paciente_ejemplo_nombre, #paciente_ejemplo_rut {
+	display:none;
+}
+.registro{
+	display:block
 }
 
 /*  Página Indicaciones y editar registros*/
@@ -3376,11 +3383,11 @@ BDO[DIR="rtl"] {
 }
 
 .post-42 .registro .fecha {
-	width: 72px;
+	width: 67px;
 }
 
 .post-42 .registro .estado {
-	width: 144px;
+	width: 115px;
 }
 
 .post-42 .registro .fcontrol {
@@ -3419,15 +3426,19 @@ BDO[DIR="rtl"] {
 }
 
 .post-42 label.nom_campo.fech {
-	width: 92px;
+	width: 86px;
 }
 
 .post-42 label.nom_campo#estado {
-	width: 142.7px;
+	width: 114.7px;
 }
 
-.post-42 .registro input.fecha , .post-42 .registro .pmuestra {
-	width: 93px;
+.post-42 .registro input.fecha  {
+	width: 99px;
+}
+
+.post-42 .registro .pmuestra {
+	width: 87px;
 }
 .post-42 .numero {
 	border-right: 1px solid #ccc;
@@ -3444,13 +3455,13 @@ BDO[DIR="rtl"] {
 	float:left;
 	margin:10px 5px;
 }
-.post-42 label.nom_campo.msud {
+.post-42 label.nom_campo.leu {
 	width: 54px;
 }
-.post-42 label.nom_campo.msud {
+.post-42 label.nom_campo.leu {
 	width: 52px;
 }
-.post-42 .registro .amino.msud {
+.post-42 .registro .amino.leu {
 	width: 31px;
 }
 
@@ -3480,20 +3491,12 @@ BDO[DIR="rtl"] {
 .post-64 #flectura {
 	width: 150px;
 }
-.post-64 .registro .nombre {
-	width: 310px;
-}
-.post-64 .registro .amino {
-	overflow: hidden;
-	width: 100px;
-}
 .post-64 .registro .fecha {
 	width: 72px;
 }
 .post-64 .box_nom_campos {
 	border: 1px solid #ccc;
 	clear:both;
-	height: 1%;
 	margin: 20px 0px 10px 0px;
 	overflow: hidden;
 	width:100%;
@@ -3510,54 +3513,68 @@ BDO[DIR="rtl"] {
 .post-64 label.nom_campo#nro {
 	width: 52px;
 }
-.post-64 label.nom_campo#nom {
-	width: 330px;
+.post-64 label.nom_campo#nom, .post-64 .registro .nombre {
+	width: 250px;
 }
-.post-64 label.nom_campo.aminoacidos {
-	width: 100px;
+.post-64 label.nom_campo#nom {
+	padding: 0px 10px;
+}
+.post-64 label.nom_campo#estado, .post-64 .registro .estado {
+	width: 12%;
+}
+.post-64 label.nom_campo#estado {
+	padding: 0 10px;
+}
+.post-64 .registro .estado {
+    line-height: 12px;
+}
+.post-64 label.nom_campo.aminoacidos, .post-64 .registro .amino {
+	width: 60px;
 }
 .post-64 label.nom_campo.fech {
-	width: 92px;
+	width: 89px;
 }
 
 .post-64 .registro input.fecha, .post-64 .registro .pmuestra{
-	width: 231px;
+	width: 9.9%;
 }
-.post-64 .numero{
+.post-64 .numero {
 	border-right: 1px solid #ccc;
 	float: left;
 	height: 35px;
 	width: 52px;
 }
-.post-64 .numero label{
-	padding:7px 0px;
+.post-64 .numero label {
+	padding: 7px 0px;
 	text-align:center;
 	margin:0;
 }
 .post-64 .numero input[type="checkbox"]{
 	float:left;
-	margin:10px 7px;
+	margin: 10px 7px;
 }
-.post-64 label.nom_campo.msud {
+.post-64 label.nom_campo.leu {
 	width: 54px;
 }
-.post-64 label.nom_campo.msud {
-	width: 100px;
+.post-64 label.nom_campo.leu {
+	width: 70px;
 }
-.post-64 .registro .amino.msud{
-	width: 102px;
+.post-64 .registro .amino.leu {
+	width: 72px;
 }
 .ui-datepicker {
 	z-index: 6 !important;
 }
 
-.all, .por-fecha {
+.all, .por-fecha, .por-anio {
 	display: none;
 }
 
-#choice label, #op1{
+#choice label, #op1, #op2 {
 	margin-right: 20px;
 }
+
+/*Página crear y editar pacientes */
 
 .post-59 #enviar{
 	float:left;
@@ -3574,6 +3591,11 @@ BDO[DIR="rtl"] {
 }
 .post-59 #resultado{
 	clear: both;
+}
+
+.post-59 #registro {
+	display: none;
+	margin-top: 0;
 }
 
 /*The last 29 days of the month are the hardest."- Nikola Tesla*/

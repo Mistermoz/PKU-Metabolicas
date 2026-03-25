@@ -57,6 +57,9 @@ if ( defined( 'WPSEO_VERSION' ) ) {
  <script src="<?php bloginfo('template_directory'); ?>/datatables/js/jquery.dataTables.min.js" type="text/javascript"></script>
  <script src="<?php bloginfo('template_directory'); ?>/js/jquery-ui-1.10.3.custom.min.js" type="text/javascript"></script>
  <script src="<?php bloginfo('template_directory'); ?>/chosen/chosen.jquery.js" type="text/javascript"></script>
+ <script>
+	const url_ajax = '/pku_movil/wp-admin/admin-ajax.php';
+ </script>
 </head>
 
 <body <?php body_class(); ?>>

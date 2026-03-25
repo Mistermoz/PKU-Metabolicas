@@ -29,39 +29,61 @@ get_header(); ?>
 			<div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
           <div class="post-entry">
-            <?php
+            		<?php
 						global $dbh;
 						$mi_tabla = 'paciente';
-						$query = "SELECT * FROM $mi_tabla GROUP BY Nombre";
+						$query = "SELECT Nombre, Rut FROM $mi_tabla GROUP BY Nombre, Rut";
 						$content = $dbh->get_results( $query );
 						if ( count($content) > 0 ) {?>
-							<label for="nombre">Elegir Nombre Paciente</label>
-							<select id="el_paciente" onChange="historial_paciente('nombre');">
-							<option>Eligir Paciente</option>
+							<label for="el_paciente_nombre">Elegir Nombre Paciente</label>
+							<select id="el_paciente_nombre" onChange="historial_paciente('nombre');">
+							<option>Eligir Paciente por Nombre</option>
 							<?php foreach ( $content as $row ) {
 								?>
-								<option value="<?php echo $row->Nombre; ?>"><?php echo $row->Nombre; ?></option>
+								<option value="<?php echo $row->Nombre; ?>" data-rut="<?php echo $row->Rut; ?>"><?php echo $row->Nombre; ?> <?php if($row->Rut != '') { echo ("&nbsp; - &nbsp;$row->Rut"); } ?></option>
 
 							<?php } ?></select>
-						<?php } ?>
-						<?php
-							$query2 = "SELECT * FROM $mi_tabla GROUP BY Fecha_lectura ORDER BY F_lectura DESC";
-							$content2 = $dbh->get_results( $query2 );
-							if ( count($content2) > 0 ) {?>
-								<label for="fecha">Elegir Fecha Lectura</label>
-								<select id="la_fecha" onChange="historial_paciente('fecha');">
-								<option>Eligir Fecha</option>
-								<?php foreach ( $content2 as $row ) {
-									?>
-									<option value="<?php echo $row->F_lectura; ?>"><?php echo $row->Fecha_lectura; ?></option>
+					<?php } ?>
+					<?php
+						global $dbh;
+						$query2 = "SELECT Nombre, Rut FROM paciente_info GROUP BY Nombre, Rut";
+						$content2 = $dbh->get_results( $query2 );
+						if ( count($content2) > 0 ) {?>
+							<label for="el_paciente_rut">Elegir Rut Paciente</label>
+							<select id="el_paciente_rut" onChange="historial_paciente('rut');">
+							<option>Eligir Paciente por rut</option>
+							<?php foreach ( $content2 as $row ) {
+								?>
+								<?php if ($row->Rut != '') { ?>
+									<option value="<?php echo $row->Rut; ?>" data-nombre="<?php echo $row->Nombre; ?>"><?php echo $row->Rut; ?> <?php if($row->Nombre != '') { echo ("&nbsp; - &nbsp;$row->Nombre"); } ?></option>
+								<?php } ?>
 
-								<?php } ?></select>
-						<?php } ?>
+							<?php } ?></select>
+					<?php } ?>
+					<?php
+						$query3 = "SELECT Fecha_lectura, F_lectura FROM $mi_tabla GROUP BY Fecha_lectura ORDER BY F_lectura DESC";
+						$content3 = $dbh->get_results( $query3 );
+						if ( count($content3) > 0 ) {?>
+							<label for="fecha">Elegir Fecha Lectura</label>
+							<select id="la_fecha" onChange="historial_paciente('fecha');">
+							<option>Eligir Fecha</option>
+							<?php foreach ( $content3 as $row ) {
+								?>
+								<option value="<?php echo $row->F_lectura; ?>"><?php echo $row->Fecha_lectura; ?></option>
+
+							<?php } ?></select>
+					<?php } ?>
 					<div id="respuesta">
 					</div>
 					<div id="resultado"></div>
 					<div id="log"></div>
-					<p class="exportar" style="display: none;">Exportar a Excel  <a href="<?php bloginfo('template_directory'); ?>/ejemplo.php?"><img src="<?php bloginfo('template_directory'); ?>/images/export_to_excel.gif" class="botonExcel"/></a></p>
+					<p class="exportar" style="display: none;">
+						<a href="<?php bloginfo('template_directory'); ?>/ejemplo.php?" download>
+							Exportar a Excel  
+							<img src="<?php bloginfo('template_directory'); ?>/images/export_to_excel.gif" class="botonExcel"/>
+						</a>
+				
+					</p>
         </div><!-- end of .post-entry -->
 
 				<?php get_template_part( 'post-data' ); ?>
@@ -82,24 +104,41 @@ function (xhr, ajaxOptions, thrownError) {
  -->
 <script src="<?php bloginfo('template_directory'); ?>/chosen/chosen.jquery.js" type="text/javascript"></script>
 <script>
+	let typeSelect = '';
+
 	jQuery(document).ready(function() {
 		jQuery(".botonExcel").click(function(event) {
 			jQuery("#FormularioExportacion").submit();
 		});
 	});
 	function historial_paciente(tipo){
+		typeSelect = tipo;
 		jQuery('#FormularioExportacion').css('display', 'none');
 		jQuery('#respuesta').html(' ');
 		jQuery("#log").text(' ');
 		jQuery("#respuesta").html('Cargando...');
-		var nom_paciente = jQuery('#el_paciente').val();
-		var fecha_paciente = jQuery('#la_fecha').val();
+
+		var nom_paciente = jQuery('#el_paciente_nombre').val();
+		var rut_paciente = jQuery('#el_paciente_rut').val();
 		var type = tipo;
+
+		if (tipo == 'rut') {
+			rut_paciente = jQuery('#el_paciente_rut').val();
+			nom_paciente = jQuery('#el_paciente_rut').children("option:selected").data('nombre');
+			type = 'nombre';
+
+		} else if (tipo == 'nombre') {
+			nom_paciente = jQuery('#el_paciente_nombre').val();
+			rut_paciente = jQuery('#el_paciente_nombre').children("option:selected").data('rut');
+		}
+		
+		var fecha_paciente = jQuery('#la_fecha').val();
+		
 		jQuery.ajax({
 			type: "POST",
-			data: {'action':'historial','nom_paciente':nom_paciente, 'fecha_paciente':fecha_paciente, 'tipo':type},
+			data: {'action':'historial','nom_paciente':nom_paciente, 'rut_paciente': rut_paciente, 'fecha_paciente':fecha_paciente, 'tipo':type},
 			dataType: "json",
-			url:'http://www.metabolicaschile.cl/pku_movil/wp-admin/admin-ajax.php',
+			url: url_ajax,
 			beforeSend: function () {
                         jQuery("#resultado").html("");
             },
@@ -111,48 +150,100 @@ function (xhr, ajaxOptions, thrownError) {
 	function errorEnvio() {
 		jQuery("#log").text("Erro envio datos");
 	}
-	function mostrarHistorial( aDatos )
-	{
+	function mostrarHistorial( aDatos ) {
 		var tipo = 1;
-		if (aDatos[0].tipo == 'nombre'){
+		if (aDatos[0].tipo == 'nombre') {
 			tipo = 0;
-			var nurl = 'nom='+jQuery('#el_paciente').val()+'';
-			jQuery('.exportar').find('a').attr('href', 'http://www.metabolicaschile.cl/pku_movil/wp-content/themes/responsive/ejemplo.php?'+nurl+'');
+			var nurl = 'nom='+aDatos[0].nombre+'';
+
+			jQuery('.exportar').find('a').attr('href', '/pku_movil/wp-content/themes/responsive/ejemplo.php?'+nurl+'');
+			jQuery('.exportar').find('a').attr('download', '/pku_movil/wp-content/themes/responsive/ejemplo.php?'+nurl+'');
 
 			if(jQuery(window).width() <= 550) {
-					var op_historial = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="tabla_historial" width="100%"><thead><tr><th>F</th><th>F.Lec</th><th>FA</th><th>TIR</th><th>LEU</th><th>E</th><th>P.Lec</th></tr></thead><tbody>';
+					var op_historial = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="tabla_historial" width="100%">'+
+						'<thead><tr><th>F</th><th>F.Lec</th><th>FA</th><th>TIR</th><th>LEU</th><th>VAL</th><th>ISO</th<th>ALLO</th><th>E</th></tr></thead><tbody>';
 					for( var contador=0; contador < aDatos.length; contador++ )
 					{
-						 op_historial +='<tr class="odd gradeX"><td class="center">'+aDatos[contador].fsort+'</td><td class="center">'+aDatos[contador].flectura+'</td><td class="center">'+aDatos[contador].fenil+'</td><td class="center">'+aDatos[contador].tir+'</td><td class="center">'+aDatos[contador].msud+'</td><td class="center">'+aDatos[contador].estado+'</td><td class="center">'+aDatos[contador].plectura+'</td></tr>';
+						 op_historial +='<tr class="odd gradeX">'+
+						 '<td class="center">'+aDatos[contador].fsort+'</td>'+
+						 '<td class="center">'+aDatos[contador].flectura+'</td>'+
+						 '<td class="center">'+aDatos[contador].fenil+'</td>'+
+						 '<td class="center">'+aDatos[contador].tir+'</td>'+
+						 '<td class="center">'+aDatos[contador].leu+'</td>'+
+						 '<td class="center">'+aDatos[contador].val+'</td>'+
+						 '<td class="center">'+aDatos[contador].iso+'</td>'+
+						 '<td class="center">'+aDatos[contador].allo+'</td>'+
+						 '<td class="center">'+aDatos[contador].estado+'</td>'+
+						 '</tr>';
 					}
-					op_historial +='</tbody><tfoot><tr><th>F</th><th>F.Lec</th><th>FA</th><th>TIR</th><th>LEU</th><th>E</th><th>P.Lec</th></tr></tfoot></table>';
-			}else {
-				var op_historial = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="tabla_historial" width="100%"><thead><tr><th>F</th><th>F. Lectura</th><th>Fenil</th><th>Tir</th><th>MSUD</th><th>Estado</th><th>P.Lectura</th><th>F.Leche</th><th>F.Muestra</th><th>F.Control</th></tr></thead><tbody>';
+					op_historial +='</tbody><tfoot><tr><th>F</th><th>F.Lec</th><th>FA</th><th>TIR</th><th>LEU</th><th>VAL</th><th>ISO</th<th>ALLO</th><th>E</th></tr></tfoot></table>';
+			} else {
+				var op_historial = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="tabla_historial" width="100%">'+
+				'<thead><tr><th>F</th><th>F. Lectura</th><th>Fenil</th><th>Tir</th><th>Leu</th><th>Val</th><th>Iso</th><th>Allo</th><th>Estado</th><th>P.Lectura</th><th>F.Muestra</th><th>F.Control</th></tr></thead><tbody>';
 				for( var contador=0; contador < aDatos.length; contador++ )
 				{
-					 op_historial +='<tr class="odd gradeX"><td class="center">'+aDatos[contador].fsort+'</td><td class="center">'+aDatos[contador].flectura+'</td><td class="center">'+aDatos[contador].fenil+'</td><td class="center">'+aDatos[contador].tir+'</td><td class="center">'+aDatos[contador].msud+'</td><td class="center">'+aDatos[contador].estado+'</td><td class="center">'+aDatos[contador].plectura+'</td><td class="center">'+aDatos[contador].fleche+'</td><td class="center">'+aDatos[contador].fmuestra+'</td><td class="center">'+aDatos[contador].fcontrol+'</td></tr>';
+					 op_historial +='<tr class="odd gradeX">'+
+					 '<td class="center">'+aDatos[contador].fsort+'</td>'+
+					 '<td class="center">'+aDatos[contador].flectura+'</td>'+
+					 '<td class="center">'+aDatos[contador].fenil+'</td>'+
+					 '<td class="center">'+aDatos[contador].tir+'</td>'+
+					 '<td class="center">'+aDatos[contador].leu+'</td>'+
+					 '<td class="center">'+aDatos[contador].val+'</td>'+
+					 '<td class="center">'+aDatos[contador].iso+'</td>'+
+					 '<td class="center">'+aDatos[contador].allo+'</td>'+
+					 '<td class="center">'+aDatos[contador].estado+'</td>'+
+					 '<td class="center">'+aDatos[contador].plectura+'</td>'+
+					 '<td class="center">'+aDatos[contador].fmuestra+'</td>'+
+					 '<td class="center">'+aDatos[contador].fcontrol+'</td>'+
+					 '</tr>';
 				}
-				op_historial +='</tbody><tfoot><tr><th>F</th><th>F. Lectura</th><th>Fenil</th><th>Tir</th><th>MSUD</th><th>Estado</th><th>P.Lectura</th><th>F.Leche</th><th>F.Muestra</th><th>F.Control</th></tr></tfoot></table>';
+				op_historial +='</tbody><tfoot><tr><th>F</th><th>F. Lectura</th><th>Fenil</th><th>Tir</th><th>Leu</th><th>Val</th><th>Iso</th><th>Allo</th><th>Estado</th><th>P.Lectura</th><th>F.Muestra</th><th>F.Control</th></tr></tfoot></table>';
 			}
 
-		}else {
+		} else {
 			var nurl = 'fecha='+jQuery('#la_fecha').val()+'';
-			jQuery('.exportar').find('a').attr('href', 'http://www.metabolicaschile.cl/pku_movil/wp-content/themes/responsive/ejemplo.php?'+nurl+'');
+			jQuery('.exportar').find('a').attr('href', '/pku_movil/wp-content/themes/responsive/ejemplo.php?'+nurl+'');
 
-			if(jQuery(window).width() <= 550) {
-				var op_historial = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="tabla_historial" width="100%"><thead><tr><th>Nombre</th><th>Fa</th><th>Tir</th><th>Leu</th><th>Est</th><th>P.Lec</th></tr></thead><tbody>';
+			if (jQuery(window).width() <= 550) {
+				var op_historial = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="tabla_historial" width="100%"><thead><tr><th>Nombre / Rut</th><th>Fa</th><th>Tir</th><th>Leu</th><th>Val</th><th>Iso</th><th>Allo</th><th>Est</th></tr></thead><tbody>';
 				for( var contador=0; contador < aDatos.length; contador++ )
 				{
-					 op_historial +='<tr class="odd gradeX"><td class="center">'+aDatos[contador].nombre+'</td><td class="center">'+aDatos[contador].fenil+'</td><td class="center">'+aDatos[contador].tir+'</td><td class="center">'+aDatos[contador].msud+'</td><td class="center">'+aDatos[contador].estado+'</td><td class="center">'+aDatos[contador].plectura+'</td></tr>';
+					var rut = (aDatos[contador].rut != '') ? ' / ' + aDatos[contador].rut: '';
+					var nomrut = aDatos[contador].nombre + rut;
+
+					 op_historial +='<tr class="odd gradeX"><td class="center">'+nomrut+' </td>'+
+					 '<td class="center">'+aDatos[contador].fenil+'</td>'+
+					 '<td class="center">'+aDatos[contador].tir+'</td>'+
+					 '<td class="center">'+aDatos[contador].leu+'</td>'+
+					 '<td class="center">'+aDatos[contador].val+'</td>'+
+					 '<td class="center">'+aDatos[contador].iso+'</td>'+
+					 '<td class="center">'+aDatos[contador].allo+'</td>'+
+					 '<td class="center">'+aDatos[contador].estado+'</td>'+
+					 '</tr>';
 				}
-				op_historial +='</tbody><tfoot><tr><th>Nombre</th><th>Fa</th><th>Tir</th><th>Leu</th><th>Est</th><th>P.Lec</th></tr></tfoot></table>';
-			}else {
-				var op_historial = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="tabla_historial" width="100%"><thead><tr><th>Nombre</th><th>Fenil</th><th>Tir</th><th>MSUD</th><th>Estado</th><th>P.Lectura</th><th>F.Leche</th><th>F.Muestra</th><th>F.Control</th></tr></thead><tbody>';
+				op_historial +='</tbody><tfoot><tr><th>Nombre / Rut</th><th>Fa</th><th>Tir</th><th>Leu</th><th>Val</th><th>Iso</th><th>Allo</th><th>Est</th></tr></tfoot></table>';
+			} else {
+				var op_historial = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="tabla_historial" width="100%"><thead><tr><th>Nombre / Rut</th><th>Fenil</th><th>Tir</th><th>Leu</th><th>Val</th><th>Iso</th><th>Allo</th><th>Estado</th><th>P.Lectura</th><th>F.Muestra</th><th>F.Control</th></tr></thead><tbody>';
 				for( var contador=0; contador < aDatos.length; contador++ )
 				{
-					 op_historial +='<tr class="odd gradeX"><td class="center">'+aDatos[contador].nombre+'</td><td class="center">'+aDatos[contador].fenil+'</td><td class="center">'+aDatos[contador].tir+'</td><td class="center">'+aDatos[contador].msud+'</td><td class="center">'+aDatos[contador].estado+'</td><td class="center">'+aDatos[contador].plectura+'</td><td class="center">'+aDatos[contador].fleche+'</td><td class="center">'+aDatos[contador].fmuestra+'</td><td class="center">'+aDatos[contador].fcontrol+'</td></tr>';
+					var rut = (aDatos[contador].rut != '') ? ' / ' + aDatos[contador].rut: '';
+					var nomrut = aDatos[contador].nombre + rut;
+
+					 op_historial +='<tr class="odd gradeX">'+
+					 '<td class="center">'+nomrut+'</td>'+
+					 '<td class="center">'+aDatos[contador].fenil+'</td>'+
+					 '<td class="center">'+aDatos[contador].tir+'</td>'+
+					 '<td class="center">'+aDatos[contador].leu+'</td>'+
+					 '<td class="center">'+aDatos[contador].val+'</td>'+
+					 '<td class="center">'+aDatos[contador].iso+'</td>'+
+					 '<td class="center">'+aDatos[contador].allo+'</td>'+
+					 '<td class="center">'+aDatos[contador].estado+'</td>'+
+					 '<td class="center">'+aDatos[contador].plectura+'</td>'+
+					 '<td class="center">'+aDatos[contador].fmuestra+'</td>'+
+					 '<td class="center">'+aDatos[contador].fcontrol+'</td>'+
+					 '</tr>';
 				}
-				op_historial +='</tbody><tfoot><tr><th>Nombre</th><th>Fenil</th><th>Tir</th><th>MSUD</th><th>Estado</th><th>P.Lectura</th><th>F.Leche</th><th>F.Muestra</th><th>F.Control</th></tr></tfoot></table>';
+				op_historial +='</tbody><tfoot><tr><th>Nombre / Rut</th><th>Fenil</th><th>Tir</th><th>Leu</th><th>Val</th><th>Iso</th><th>Allo</th><th>Estado</th><th>P.Lectura</th><th>F.Muestra</th><th>F.Control</th></tr></tfoot></table>';
 			}
 		}
 
@@ -164,7 +255,7 @@ function (xhr, ajaxOptions, thrownError) {
 					"sProcessing":     "Procesando...",
 					"sLengthMenu":     "Mostrar _MENU_ registros",
 					"sZeroRecords":    "No se encontraron resultados",
-					"sEmptyTable":     "Ningún dato disponible en esta tabla",
+					"sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
 					"sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
 					"sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
 					"sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -175,7 +266,7 @@ function (xhr, ajaxOptions, thrownError) {
 					"sLoadingRecords": "Cargando...",
 					"oPaginate": {
 						"sFirst":    "Primero",
-						"sLast":     "Último",
+						"sLast":     "ï¿½ltimo",
 						"sNext":     "Siguiente",
 						"sPrevious": "Anterior",
 					},
@@ -192,7 +283,7 @@ function (xhr, ajaxOptions, thrownError) {
 					"sProcessing":     "Procesando...",
 					"sLengthMenu":     "Mostrar _MENU_ registros",
 					"sZeroRecords":    "No se encontraron resultados",
-					"sEmptyTable":     "Ningún dato disponible en esta tabla",
+					"sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
 					"sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
 					"sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
 					"sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -203,7 +294,7 @@ function (xhr, ajaxOptions, thrownError) {
 					"sLoadingRecords": "Cargando...",
 					"oPaginate": {
 						"sFirst":    "Primero",
-						"sLast":     "Último",
+						"sLast":     "ï¿½ltimo",
 						"sNext":     "Siguiente",
 						"sPrevious": "Anterior",
 					},
@@ -241,7 +332,8 @@ function (xhr, ajaxOptions, thrownError) {
 		jQuery("#resultado").html("OK");
 	}
 	var config = {
-      '#el_paciente'           : {width:"100%"},
+      '#el_paciente_nombre'           : {width:"100%"},
+      '#el_paciente_rut'           : {width:"100%"},
       '#la_fecha'           : {width:"100%"}
     }
     for (var selector in config) {
