@@ -3216,121 +3216,110 @@ BDO[DIR="rtl"] {
 	margin-top: 0px;
 }
 /******************************************* Ingreso Usuarios***************************************************************/
-.ingresa-lec .box_nom_campos{
-	clear: both;
+.ingresa-lec .box_nom_campos {
+	display: flex;
 	height: 60px;
 	width: 100%;
 }
-.ingresa-lec .nom_campos{
-	float: left;
+.ingresa-lec .nom_campos {
 	margin-right: 10px;
 }
-.ingresa-lec label{
-	float: left;
-	padding: 1.15%;
+.ingresa-lec .nom_campo {
+	box-sizing: border-box;
+}
+.ingresa-lec label {
+	padding: 10px 5px;
 	text-align: center;
 }
-.ingresa-lec .box_nom_campos label{
+.ingresa-lec .box_nom_campos label {
 	border: 1px solid #ccc;
 }
 .ingresa-lec  input[type="radio"]{
-	float: left;
 	margin: 22px 10px;
 }
-.ingresa-lec .fenil, .ingresa-lec .tiro, .ingresa-lec .leu{
-	width: 6.7%;
-	margin-right: 8px;
-	float: left;
+.ingresa-lec .amin {
+	flex-grow: 1;
 }
-.ingresa-lec .nombre, .ingresa-lec #el_paciente_chzn{
-	float: left;
+.ingresa-lec .nombre, .ingresa-lec #el_paciente_chzn {
 	display: none;
 	height: 30px;
 	width: 100%;
 }
-.ingresa-lec .nombre_none{
+.ingresa-lec .nombre_none {
 	border: 1px solid red;
 }
-.ingresa-lec .fecha{
-	float: left;
-	margin-right: 8px;
-	text-align: center;
-	width: 14.9%;
-}
-.ingresa-lec .fmuestra{
+.ingresa-lec .fmuestra {
 	margin-right: 0px;
 }
-.ingresa-lec .fecha_none{
+.ingresa-lec .fecha_none {
 	border: 1px solid red;
 }
-.ingresa-lec #nro{
-	width: 3%;
+.ingresa-lec .nom_campo--nro {
+	flex-shrink: 0;
+	flex-basis: 48px;
 }
-.ingresa-lec #rut_nom{
-	width: 10%;
+.ingresa-lec .nom_campo--nom {
+	flex-basis: 192px;
+	flex-shrink: 0;
 }
-.ingresa-lec #nom{
-	width: 32.7%;
+.ingresa-lec .nom_campo--flec {
+	flex-shrink: 0;
+	flex-basis: 100px;
 }
-.ingresa-lec #flec, .ingresa-lec #fmues{
-	width: 13.3%;
+.ingresa-lec .nom_campo--fmues {
+	flex-shrink: 0;
+	flex-basis: 100px;
 }
-.ingresa-lec #tir, .ingresa-lec #fen, .ingresa-lec #leu{
-	width: 5%;
-}
-.ingresa-lec #leu{
+.ingresa-lec .MSUD {
 	display:none;
 }
-.ingresa-lec .leu{
-	width: 6.8%;
-	margin-right: 8px;
-	display: none;
-	float: left;
+.ingresa-lec .chzn-single {
+	height: 37px;
 }
-.ingresa-lec  input[name="paciente"]{
-	float: left;
+.ingresa-lec .chzn-container-single .chzn-single span {
+	line-height: 37px;
+}
+.ingresa-lec .chzn-container-single .chzn-single div {
+	padding-top: 7px;
+}
+.ingresa-lec .input_rut_nom {
+	height: 40px;
+}
+.ingresa-lec .leu {
+	display: none;
+}
+.ingresa-lec  input[name="paciente"] {
 	margin: 10px 10px;
 }
-.ingresa-lec label.elige_paciente{
-	float:left;
+.ingresa-lec label.elige_paciente {
 	padding: 7px;
 	text-align: center;
-	margin: 0px 0px 0px 46px;
+	margin: 0px 0px 0px 7px;
 }
-.ingresa-lec .box_paciente{
-	float: left;
-	height: 30px;
-	margin-right: 8px;
-	width: 34.5%;
-}
-.ingresa-lec .registro{
-	height:40px;
+.ingresa-lec .registro {
+	display: flex;
+	height: 40px;
 	width:100%;
 }
-.ingresa-lec .numero{
-	float: left;
-	height: 30px;
-	width: 5.5%;
+.ingresa-lec .registro * {
+	box-sizing: border-box;
 }
-.ingresa-lec .numero label{
+.ingresa-lec .numero label {
 	padding: 7px;
 	text-align: center;
 	margin: 0;
 }
-.ingresa-lec .numero input[type="checkbox"]{
-	float:left;
+.ingresa-lec .numero input[type="checkbox"] {
 	height: 12px;
 	margin: 10px 0px;
 	width: 12px;
 }
-.ingresa-lec .rut {
-	float: left;
-	margin-right: 8px;
-	width: 12%;
+.ingresa-lec .nom_campo--rut_nom {
+	flex-shrink: 0;
+	flex-basis: 100px;
 }
-.ingresa-lec .box_inputs{
-	clear: both;
-	height:1%;
+.ingresa-lec .rut {
+	width: 109px;
 }
 .ingresa-lec .link-agregar-paciente {
 	text-align: left;
@@ -3338,7 +3327,7 @@ BDO[DIR="rtl"] {
 #paciente_ejemplo, #paciente_ejemplo_nombre, #paciente_ejemplo_rut {
 	display:none;
 }
-.registro{
+.registro {
 	display:block
 }
 
@@ -3348,7 +3337,7 @@ BDO[DIR="rtl"] {
 	border: 1px solid #ccc;
 	border-right: none;
 	clear: both;
-	display:block;
+	display: flex;
 	height:35px;
 	margin-bottom: 10px;
 	width:100%;
@@ -3434,7 +3423,7 @@ BDO[DIR="rtl"] {
 }
 
 .post-42 .registro input.fecha  {
-	width: 99px;
+	width: 97px;
 }
 
 .post-42 .registro .pmuestra {
